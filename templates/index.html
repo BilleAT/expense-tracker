@@ -23,10 +23,12 @@
         <!-- Currency Dropdown -->
         <div class="mb-4">
             <label for="currency" class="form-label">Select Currency:</label>
-            <select id="currency" class="form-select w-auto" onchange="convertTotal()">
-                <option value="USD" selected>USD</option>
-                <option value="DKK">DKK</option>
-            </select>
+            <form method="POST" action="/set_currency">
+                <select id="currency" name="currency" class="form-select w-auto" onchange="this.form.submit()">
+                    <option value="USD" {% if currency == 'USD' %}selected{% endif %}>USD</option>
+                    <option value="DKK" {% if currency == 'DKK' %}selected{% endif %}>DKK</option>
+                </select>
+            </form>
         </div>
 
         <!-- Total Display -->
@@ -34,10 +36,14 @@
             <div class="card-body">
                 <h3 class="card-title">Total Expenses</h3>
                 <p class="card-text display-4 text-primary">
-                    <span id="total-expenses" data-usd="{{ total_usd }}">
-                        {{ total_usd }}
+                    <span id="total-expenses">
+                        {% if currency == "USD" %}
+                            {{ total_usd }}
+                        {% else %}
+                            {{ total_usd * 7.2 }}
+                        {% endif %}
                     </span>
-                    <span id="currency-symbol">USD</span>
+                    <span id="currency-symbol">{{ currency }}</span>
                 </p>
             </div>
         </div>
@@ -67,31 +73,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        const exchangeRate = {
-            USD: 1,
-            DKK: 7.2
-        };
-
-        function convertTotal() {
-            const selectedCurrency = document.getElementById("currency").value;
-            const totalElem = document.getElementById("total-expenses");
-            const totalUSD = parseFloat(totalElem.getAttribute("data-usd"));
-
-            const convertedTotal = selectedCurrency === "USD" 
-                ? Math.round(totalUSD) 
-                : Math.round(totalUSD * exchangeRate.DKK);
-
-            totalElem.textContent = convertedTotal;
-            document.getElementById("currency-symbol").textContent = selectedCurrency;
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const storedCurrency = localStorage.getItem("selectedCurrency") || "USD";
-            document.getElementById("currency").value = storedCurrency;
-            convertTotal();
-        });
-    </script>
 </body>
 </html>

@@ -25,10 +25,14 @@
             <div class="card-body">
                 <h3 class="card-title">Total Expenses</h3>
                 <p class="card-text display-4 text-primary">
-                    <span id="filter-total-expenses" data-usd="{{ total_usd }}">
-                        {{ total_usd }}
+                    <span id="filter-total-expenses">
+                        {% if currency == "USD" %}
+                            {{ total_usd }}
+                        {% else %}
+                            {{ total_usd * 7.2 }}
+                        {% endif %}
                     </span>
-                    <span id="filter-currency-symbol">USD</span>
+                    <span id="filter-currency-symbol">{{ currency }}</span>
                 </p>
             </div>
         </div>
@@ -55,29 +59,5 @@
             <p class="text-muted">No expenses have been added yet.</p>
         {% endif %}
     </div>
-
-    <script>
-        const exchangeRate = {
-            USD: 1,
-            DKK: 7.2
-        };
-
-        function convertFilterTotal() {
-            const selectedCurrency = localStorage.getItem("selectedCurrency") || "USD";
-            const totalElem = document.getElementById("filter-total-expenses");
-            const totalUSD = parseFloat(totalElem.getAttribute("data-usd"));
-
-            const convertedTotal = selectedCurrency === "USD" 
-                ? Math.round(totalUSD) 
-                : Math.round(totalUSD * exchangeRate.DKK);
-
-            totalElem.textContent = convertedTotal;
-            document.getElementById("filter-currency-symbol").textContent = selectedCurrency;
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            convertFilterTotal();
-        });
-    </script>
 </body>
 </html>
