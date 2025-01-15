@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Expenses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Expense Tracker</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1 class="mb-4">All Expenses</h1>
+
+        <!-- Total Display -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">Total Expenses</h3>
+                <p class="card-text display-4 text-primary">
+                    <span id="filter-total-expenses" data-usd="{{ total_usd }}">
+                        {{ total_usd }}
+                    </span>
+                    <span id="filter-currency-symbol">USD</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- List of Expenses -->
+        {% if expenses %}
+            <ul class="list-group">
+                {% for expense in expenses %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Amount:</strong> {{ expense.amount }} {{ expense.currency }},
+                            <strong>Category:</strong> {{ expense.category }}
+                        </div>
+                        <form method="POST" action="/remove" class="ms-2">
+                            <input type="hidden" name="amount" value="{{ expense.amount }}">
+                            <input type="hidden" name="currency" value="{{ expense.currency }}">
+                            <input type="hidden" name="category" value="{{ expense.category }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No expenses have been added yet.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        const exchangeRate = {
+            USD: 1,
+            DKK: 7.2
+        };
+
+        function convertFilterTotal() {
+            const selectedCurrency = localStorage.getItem("selectedCurrency") || "USD";
+            const totalElem = document.getElementById("filter-total-expenses");
+            const totalUSD = parseFloat(totalElem.getAttribute("data-usd"));
+
+            const convertedTotal = selectedCurrency === "USD" 
+                ? Math.round(totalUSD) 
+                : Math.round(totalUSD * exchangeRate.DKK);
+
+            totalElem.textContent = convertedTotal;
+            document.getElementById("filter-currency-symbol").textContent = selectedCurrency;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            convertFilterTotal();
+        });
+    </script>
+</body>
+</html>
